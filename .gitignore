@@ -1,0 +1,5 @@
+*.o
+voidcore
+voideditor
+*.exe   
+.DS_Store
