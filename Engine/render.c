@@ -64,3 +64,24 @@ void Render_EndDrawing(void) {
     printf("%s", RESET);
     fflush(stdout);
 }
+
+void DrawFPS(int fps, int fps_x, int fps_y) {
+    char* color;
+    if (fps_x < 0) fps_x = 0;
+    if (fps_x > SCR_WIDTH - 10) fps_x = SCR_WIDTH - 10; // FPS metni 10 karakter uzunluğunda, sınırları aşmamak için -10
+    if (fps_y < 0) fps_y = 0;
+    if (fps_y > SCR_HEIGHT - 1) fps_y = SCR_HEIGHT - 1; // FPS metni tek satır, sınırları aşmamak için -1
+    
+    if (fps >= 60) {
+        color = YESIL; // Yeşil: Harika performans
+
+    }
+    else if (fps >= 30) {
+        color = SARI; // Sarı: Kabul edilebilir performans
+    } else {
+        color = KIRMIZI; // Kırmızı: Düşük performans
+    }
+    char fps_text[20];
+    snprintf(fps_text, sizeof(fps_text), "[FPS: %d]", fps);
+    Render_DrawText(fps_x, fps_y, fps_text, color);
+}
