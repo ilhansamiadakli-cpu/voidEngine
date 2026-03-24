@@ -26,14 +26,13 @@ void Oyun_Baslat(void) {
     if (tus == 'd' && oyuncu_x < SCR_WIDTH - 1) oyuncu_x++;
 }
 void Oyun_Ekrana_Ciz(){
-    Render_BeginDrawing();
+    // not: Render_DrawPixel ve Render_DrawText fonksiyonları, ekran sınırlarını aşmamak için zaten güvenli hale getirildi.
+    // sen bizi bulamazsın, biz seni buluruz! (buffer overflow yok artık)
     Render_DrawPixel(oyuncu_x, oyuncu_y, '@', SARI);
     Render_DrawPixel(canavar_x, canavar_y, 'M', KIRMIZI);
 
-// 3. ARAYÜZÜ (UI) ÇİZ! (İşte yeni gücümüz)
+
     Render_DrawText(2, 1, "voidEngine v0.3 - Mimar: Ilhan", CYAN);
     Render_DrawText(65, 1, "[FPS: 60]", YESIL);
     Render_DrawText(oyuncu_x + 1, oyuncu_y - 1, "Burasi neresi?", BEYAZ);
-
-Render_EndDrawing(); // 4. Ekrana ateşle!
 }
