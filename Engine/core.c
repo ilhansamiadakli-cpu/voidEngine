@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 static bool is_running = false;
 int target_ms = 16;
@@ -71,9 +72,9 @@ void Engine_Run(void (*UpdateFunc)(char), void (*RenderFunc)(void)) {
 
         // 3. ÇİZİM (RENDER)
         if (RenderFunc != NULL) {
-            Render_BeginFrame(); // İmleci başa al
+            Render_BeginDrawing(); // İmleci başa al
             RenderFunc();        // Oyunun çizim fonksiyonunu çağır (Eski karakterleri ez)
-            Render_EndFrame();   // Ekrana yansıt
+            Render_EndDrawing();   // Ekrana yansıt
         }
 
         // FPS KİLİDİ

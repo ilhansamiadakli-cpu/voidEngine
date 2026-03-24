@@ -3,49 +3,37 @@
 #include "../Engine/core.h"
 #include "../Engine/utils.h"
 #include "../Engine/colors.h"
+#include "../Engine/render.h"
+#include "../Engine/input.h"
 #include <stdio.h>
 
-// Oyun nesnelerimiz
-Typewriter hikaye_kutusu;
-int oyuncu_x = 5;
-int oyuncu_y = 5;
-
+    static int oyuncu_x = 10, oyuncu_y = 10;
+    static int canavar_x = 30, canavar_y = 10;
 void Oyun_Baslat(void) {
-    // Motoru 30 FPS'e sabitleyelim (Retro hissi için)
-    setTargetFPS(30); 
-    
-    // Daktiloyu kur (100ms hızında yazsın)
-    Typewriter_Baslat(&hikaye_kutusu, "VoidEngine 0.2 Sistemleri Aktif... Dusmanlar yaklasiyor!", 100);
+    // Oyun başladığında yapılacak ilk ayarlar (varsa)
+    // Örneğin, haritayı yükleyebilir veya oyuncunun başlangıç konumunu ayarlayabiliriz.
 }
 
-void Oyun_Guncelle(char tus) {
-    // 1. Daktiloyu ilerlet (Bloklamaz, sadece zamanı gelince bir harf açar)
-    Typewriter_Guncelle(&hikaye_kutusu);
+ void Oyun_Guncelle(char tus) {
 
-    // 2. Oyuncu hareketleri (Daktilo yazarken bile çalışır!)
-    if (tus == 'w') oyuncu_y--;
-    if (tus == 's') oyuncu_y++;
-    if (tus == 'a') oyuncu_x--;
-    if (tus == 'd') oyuncu_x++;
-    
-    if (tus == 'q') Engine_Stop();
-}
-
-void Oyun_Ekrana_Ciz(void) {
-    // Oyuncuyu çiz
-    imleci_tasi(oyuncu_x, oyuncu_y);
-    printf("%s@%s", YESIL, BEYAZ);
-
-    // Daktilo Metnini Alt Kısma Çiz
-    imleci_tasi(2, 20);
-    printf("%s[MESAJ]: %s", SARI, BEYAZ);
-    for(int i = 0; i < hikaye_kutusu.su_anki_indis; i++) {
-        putchar(hikaye_kutusu.metin[i]);
+    if (tus == 'q') {
+        Engine_Stop();
     }
-    
-    // FPS bilgisini köşeye yazalım
-    imleci_tasi(2, 2);
-    printf("%sFPS Hedefi: %d%s", SIYAH_ARKA, 1000/target_ms, BEYAZ);
+    // 1. OYUNCUYU HAREKET ETTİR (Duvarların içinden geçebilir!)
+    if (tus == 'w' && oyuncu_y > 0) oyuncu_y--;
+    if (tus == 's' && oyuncu_y < SCR_HEIGHT - 1) oyuncu_y++;
+    if (tus == 'a' && oyuncu_x > 0) oyuncu_x--;
+    if (tus == 'd' && oyuncu_x < SCR_WIDTH - 1) oyuncu_x++;
 }
- 
+void Oyun_Ekrana_Ciz(){
+    Render_BeginDrawing();
+    Render_DrawPixel(oyuncu_x, oyuncu_y, '@', SARI);
+    Render_DrawPixel(canavar_x, canavar_y, 'M', KIRMIZI);
 
+// 3. ARAYÜZÜ (UI) ÇİZ! (İşte yeni gücümüz)
+    Render_DrawText(2, 1, "voidEngine v0.3 - Mimar: Ilhan", CYAN);
+    Render_DrawText(65, 1, "[FPS: 60]", YESIL);
+    Render_DrawText(oyuncu_x + 1, oyuncu_y - 1, "Burasi neresi?", BEYAZ);
+
+Render_EndDrawing(); // 4. Ekrana ateşle!
+}

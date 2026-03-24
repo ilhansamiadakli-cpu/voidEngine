@@ -20,6 +20,7 @@
 #define ACIK_MAVI  "\033[1;36m"
 #define MOR        "\033[1;35m"
 #define SIYAH      "\033[1;30m"
+#define CYAN       "\033[1;36m"
 
 //----- Arka Plan Renkleri -----
 #define SARI_ARKA       "\033[43m"
