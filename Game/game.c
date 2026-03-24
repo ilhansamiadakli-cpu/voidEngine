@@ -26,6 +26,15 @@ void Oyun_Baslat(void) {
     if (tus == 'd' && oyuncu_x < SCR_WIDTH - 1) oyuncu_x++;
 }
 void Oyun_Ekrana_Ciz(){
+    
+    /*Önemli bir not:setTargetFPS fonksiyonu ekleyerek, oyun döngüsünün her turunda belirli bir süre beklemesini sağladık.
+     Bu, oyunun çok hızlı çalışmasını engeller ve CPU kullanımını azaltır. 60 FPS genellikle akıcı bir deneyim sağlar, ancak istersen bunu değiştirebilirsin!
+     eğer setTargetFPS(0) yaparsan, FPS kilidini kaldırmış olursun ve oyun mümkün olan en yüksek hızda çalışır. Bu, bazı durumlarda faydalı olabilir 
+     (örneğin, performans testleri yaparken), ancak genellikle önerilmez çünkü oyunun çok hızlı çalışmasına ve kontrolün zorlaşmasına neden olabilir.
+     eğer setTargetFPS() yazmasan bile oyun motoru otomatik 60 FPS'e ayarlanır, bu yüzden endişelenme! Ancak setTargetFPS() fonksiyonunu kullanarak istediğin FPS değerini kolayca değiştirebilirsin.
+     */ 
+    setTargetFPS(60); // FPS kilidi (opsiyonel, ama genellikle iyi bir fikirdir)
+
     // not: Render_DrawPixel ve Render_DrawText fonksiyonları, ekran sınırlarını aşmamak için zaten güvenli hale getirildi.
     // sen bizi bulamazsın, biz seni buluruz! (buffer overflow yok artık)
     Render_DrawPixel(oyuncu_x, oyuncu_y, '@', SARI);
