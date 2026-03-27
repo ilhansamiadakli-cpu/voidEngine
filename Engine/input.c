@@ -24,7 +24,7 @@ char Input_GetRawKey(void) {
     return c;
 #endif
 }
-
+// Bu fonksiyon, tuş gelene kadar bekler ve ardından o tuşu döndürür
 char Input_GetPressed(void) {
     char tus = 0;
     // Tuş gelene kadar döngüyü işlet
