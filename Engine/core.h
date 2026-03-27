@@ -10,8 +10,10 @@ void Engine_Init(void);
 void Engine_Stop(void);
 void Engine_Close(void); // Terminali eski haline getir
 void setTargetFPS(int fps);
+double GetCurrentTimeInSeconds(void); // Zaman ölçümü için
+
 
 // Motorun ana döngüsü. Dışarıdan oyunun kurallarını parametre olarak alır.
-void Engine_Run(void (*UpdateFunc)(char), void (*RenderFunc)(void));
+void Engine_Run(void (*UpdateFunc)(char, float), void (*RenderFunc)(float));
 
 #endif // CORE_H

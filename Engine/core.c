@@ -7,6 +7,26 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifdef _WIN32
+    #include <windows.h>
+#else
+    #include <time.h>
+#endif
+
+// İşletim sisteminden "Saniye" cinsinden ultra hassas zamanı çeker
+double GetCurrentTimeInSeconds(void) {
+#ifdef _WIN32
+    LARGE_INTEGER freq, counter;
+    QueryPerformanceFrequency(&freq);   // İşlemcinin tik hızını al
+    QueryPerformanceCounter(&counter);  // Şu anki tiki al
+    return (double)counter.QuadPart / freq.QuadPart;
+#else
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts); // Geriye sarılamayan sistem saati
+    return (double)ts.tv_sec + (double)ts.tv_nsec / 1000000000.0;
+#endif
+}
+
 static bool is_running = false;
 int target_ms = 16;
 // Ctrl+C (SIGINT) sinyalini yakalayan fonksiyon
@@ -57,27 +77,32 @@ void Engine_Stop(void) {
 }
 
 // İŞTE MOTORUN KALBİ (THE GAME LOOP)
-void Engine_Run(void (*UpdateFunc)(char), void (*RenderFunc)(void)) {
+void Engine_Run(void (*UpdateFunc)(char, float), void (*RenderFunc)(float)) {
     is_running = true;
+    double lastTime = GetCurrentTimeInSeconds();// Zaman ölçümü için başlangıç zamanı
 
     while (is_running) {
-        // 1. GİRDİ (INPUT)
+        // ZAMAN (deltaTIME)
+        double currentTime = GetCurrentTimeInSeconds();// Şu anki zamanı al
+        float deltaTime = (float)(currentTime - lastTime);// İki döngü arasındaki geçen süre (saniye cinsinden)
+        lastTime = currentTime;
+        // 1. GİRİŞ (INPUT)
         char tus = Input_GetRawKey();
 
         // 2. GÜNCELLEME (UPDATE)
         // Motor oyunun ne olduğunu bilmez, sadece "Oyun geliştiricisi ne verdiyse onu çalıştır" der.
         if (UpdateFunc != NULL) {
-            UpdateFunc(tus);
+            UpdateFunc(tus, deltaTime);
         }
 
         // 3. ÇİZİM (RENDER)
         if (RenderFunc != NULL) {
             Render_BeginDrawing(); // İmleci başa al
-            RenderFunc();        // Oyunun çizim fonksiyonunu çağır (Eski karakterleri ez)
+            RenderFunc(deltaTime);        // Oyunun çizim fonksiyonunu çağır (Eski karakterleri ez)
             Render_EndDrawing();   // Ekrana yansıt
         }
 
-        // FPS KİLİDİ
+        // FPS KİLİDİ (İsteğe bağlı, ama genellikle oyunlarda olur)
         ms_bekle(target_ms); 
     }
 

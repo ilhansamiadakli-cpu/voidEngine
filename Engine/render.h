@@ -9,6 +9,6 @@ void Render_ClearBuffer(void);
 void Render_DrawPixel(int x, int y, char c, const char* color);
 void Render_DrawText(int x, int y, const char* text, const char* color);
 void Render_EndDrawing(void); 
-void DrawFPS(int fps, int fps_x, int fps_y);
+void DrawFPS(int fps_x, int fps_y, float deltaTime);
 
 #endif

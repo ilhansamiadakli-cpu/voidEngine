@@ -13,16 +13,19 @@
 typedef enum { EKRAN_MENU, EKRAN_OYUN } OyunDurumu;
 static OyunDurumu aktif_ekran = EKRAN_MENU; // Oyun ilk açıldığında menü ile başlar!
 
-static int oyuncu_x = 10, oyuncu_y = 10;
+static float oyuncu_x = 10, oyuncu_y = 10;
 static int canavar_x = 30, canavar_y = 10;
-
+float hız=15.0f;
+bool etkilendi = false;
 void Oyun_Baslat(void) {
     // Yorumlayıcı çalışır ve txt dosyasını okuyup RAM'e kaydeder.
     Typewriter_MsGuncelle(50); // Daktilo hızını güncelle (örneğin, 300 ms yap)
     UI_LoadMenu("Game/menu.txt"); 
 }
 
-void Oyun_Guncelle(char tus) {
+void Oyun_Guncelle(char tus, float deltaTime) {
+    
+    
     
 
     if (tus == 'q') Engine_Stop();
@@ -41,14 +44,24 @@ void Oyun_Guncelle(char tus) {
     }
     // 2. DURUM: EĞER OYUNDAYSAK
     else if (aktif_ekran == EKRAN_OYUN) {
-        if (tus == 'w' && oyuncu_y > 0) oyuncu_y--;
-        if (tus == 's' && oyuncu_y < SCR_HEIGHT - 1) oyuncu_y++;
-        if (tus == 'a' && oyuncu_x > 0) oyuncu_x--;
-        if (tus == 'd' && oyuncu_x < SCR_WIDTH - 1) oyuncu_x++;
+        if (tus == 'w' && oyuncu_y > 0) oyuncu_y-=hız*deltaTime;
+        if (tus == 's' && oyuncu_y < SCR_HEIGHT - 1) oyuncu_y+=hız*deltaTime;
+        if (tus == 'a' && oyuncu_x > 0) oyuncu_x-=hız*deltaTime;
+        if (tus == 'd' && oyuncu_x < SCR_WIDTH - 1) oyuncu_x+=hız*deltaTime;
+        if(tus=='f'){
+            hız+=1.5f; // Hızı artır
+            }
+        if(tus=='g' && hız>0.5f){
+            hız-=1.5f; // Hızı azalt
+        }
+        if(tus =='e'){
+            etkilendi=true;
+        }
+
     }
 }
 
-void Oyun_Ekrana_Ciz(void) {
+void Oyun_Ekrana_Ciz(float deltaTime) {
     // Motor tuvali zaten temizledi. Şimdi ne çizeceğimize karar verelim:
     setTargetFPS(60);
     if (aktif_ekran == EKRAN_MENU) {
@@ -56,11 +69,24 @@ void Oyun_Ekrana_Ciz(void) {
         UI_Render(); 
     } 
     else if (aktif_ekran == EKRAN_OYUN) {
-        // Menüyü unut, haritayı ve oyuncuyu çiz
-        Render_DrawPixel(oyuncu_x, oyuncu_y, '@', SARI);
-        Render_DrawText(2, 0, "Oyunda! (WASD ile hareket, Q ile cikis)", SARI);
-        Render_DrawText(oyuncu_x + 1, oyuncu_y - 1, "Burasi neresi?", BEYAZ); 
+        int oyuncuCizim_x = (int)oyuncu_x;
+        int oyuncuCizim_y = (int)oyuncu_y;
+        Render_DrawPixel(oyuncuCizim_x, oyuncuCizim_y, '@', SARI);
+        DrawFPS(69, 1, deltaTime); // FPS'i sağ üst köşeye çiz
+        Render_DrawText(2, 0, "Oyunda! (WASD ile hareket, Q ile cikis, F/G ile hiz artir/azalt, E ile etkilesim)", SARI);
+        Render_DrawText(3, 2, "Hiz: ", MAVI);// hız göstergesi basılamıyor malesef, çünkü Render_DrawText fonksiyonu şu anda sadece sabit metinler için tasarlandı. Hızı dinamik olarak göstermek için önce hızı bir string'e çevirmemiz gerekiyor. İşte nasıl yapabileceğimiz:
+        char hiz_str[10];
+        sprintf(hiz_str, "%.1f", hız); // Hızı string'e çevir (örneğin, 1.0, 1.5 gibi)
+        Render_DrawText(8, 2, hiz_str, SARI); // Hızı ekrana yazdır
+        if(!etkilendi) Render_DrawText(oyuncuCizim_x + 1, oyuncuCizim_y - 1, "Burasi neresi?", BEYAZ); 
         Render_DrawPixel(canavar_x, canavar_y, 'M', KIRMIZI);
         Render_DrawText(2, 1, "voidEngine v0.3", CYAN);
+        if(etkilendi && oyuncuCizim_x > canavar_x - 2 && oyuncuCizim_x < canavar_x + 2 && oyuncuCizim_y > canavar_y - 2 && oyuncuCizim_y < canavar_y + 2    ){
+            Render_DrawText(oyuncuCizim_x+1, oyuncuCizim_y-1, "Sende kimsin?", BOLD);
+        }
+        else{
+            Render_DrawText(oyuncuCizim_x + 1, oyuncuCizim_y - 1, "Burasi neresi?", BEYAZ);
+            etkilendi=false; 
+        } 
     }
 }
