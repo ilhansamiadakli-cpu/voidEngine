@@ -1,6 +1,10 @@
 #ifndef UI_H
 #define UI_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "colors.h"
 #include "utils.h" // Daktilo yapısı için utils'i dahil ettik!
 
@@ -31,5 +35,9 @@ void UI_LoadMenu(const char* dosya_yolu);
 ButtonAction UI_Update(char tus);
 void UI_Render(void);
 void Typewriter_MsGuncelle(int ms); // Daktilo hızını güncellemek için yeni fonksiyon
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // UI_H

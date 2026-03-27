@@ -1,6 +1,10 @@
 #ifndef COLORS_H
 #define COLORS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //----- Windows için Gerekli Ayarlar -----
 #ifdef _WIN32
     #include <windows.h>
@@ -40,6 +44,8 @@
 #define REVERSE    "\033[7m"          // Ters renk
 #define RESET      "\033[0m"          // Sıfırla
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif // COLORS_H

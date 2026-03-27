@@ -2,7 +2,7 @@
 #include "render.h"
 #include "colors.h"
 #include "core.h"
-#define FPS_SAMPLES 30 // Ortalama FPS için kaç karelik veri tutacağımız
+
 
 // --- MOTORUN İÇ ORGANLARI (Dışarıdan erişilemez!) ---
 static char screen_buffer[SCR_HEIGHT][SCR_WIDTH];
@@ -68,52 +68,41 @@ void Render_EndDrawing(void) {
 
 
 void DrawFPS(int fps_x, int fps_y, float deltaTime) {
-    if (deltaTime <= 0.0f) deltaTime=0.0001; // Sıfıra bölünme koruması
+    // 0'a bölünme veya çok küçük süre hatasını engelle (Limit 10.000 FPS)
+    if (deltaTime <= 0.0001f) deltaTime = 0.0001f;
 
-    // --- ORTALAMA FPS HESAPLAMA (CIRCULAR BUFFER) ---
-    static float frame_times[FPS_SAMPLES] = {0};
-    static int current_sample = 0;
-    static bool initialized = false;
+    // --- 1. ARKA PLAN MATEMATİĞİ (Her kare çalışır) ---
+    static float avg_deltaTime = 0.016f; 
+    avg_deltaTime = (avg_deltaTime * 0.90f) + (deltaTime * 0.10f); 
 
-    // Motor ilk açıldığında dizi boş olmasın diye varsayılan 60 FPS (0.016) ile dolduruyoruz
-    if (!initialized) {
-        for(int i = 0; i < FPS_SAMPLES; i++) {
-            frame_times[i] = target_ms > 0 ? (1.0f / (1000.0f / target_ms)) : 0.00001f; 
-        }
-        initialized = true;
+    // --- 2. UI GÜNCELLEME ZAMANLAYICISI (Sihrin olduğu yer) ---
+    static float ui_timer = 0.0f;
+    static int display_fps = 60; // Ekranda sabit duracak olan sayı
+
+    ui_timer += deltaTime;
+    // Eğer 0.25 saniye (250ms) geçtiyse, ekrandaki sayıyı güncelle!
+    if (ui_timer >= 0.25f) { 
+        display_fps = (int)(1.0f / avg_deltaTime);
+        ui_timer = 0.0f; // Zamanlayıcıyı sıfırla
     }
+    // -----------------------------------------------------------
 
-    // Yeni gelen deltaTime'ı dizideki sıradaki yere yaz (eskiyi ez)
-    frame_times[current_sample] = deltaTime;
-    current_sample = (current_sample + 1) % FPS_SAMPLES; // 10'a gelince tekrar 0'a dön
-
-    // Dizideki son 10 karenin toplam zamanını bul
-    float sum = 0.0f;
-    for (int i = 0; i < FPS_SAMPLES; i++) {
-        sum += frame_times[i];
-    }
-    
-    // Toplamı 10'a bölerek Ortalama Delta Time'ı bul
-    float avg_deltaTime = sum / FPS_SAMPLES;
-    int fps = (int)(1.0f / avg_deltaTime); // Ortalama FPS'i hesapla
-    // --------------------------------------------------
-
-    // --- ÇİZİM VE RENK KISMI (Aynı Kaldı) ---
     char* color;
     if (fps_x < 0) fps_x = 0;
     if (fps_x > SCR_WIDTH - 10) fps_x = SCR_WIDTH - 10; 
     if (fps_y < 0) fps_y = 0;
     if (fps_y > SCR_HEIGHT - 1) fps_y = SCR_HEIGHT - 1; 
 
-    if (fps >= 50) {
+    // Rengi de anlık FPS'e göre değil, ekranda gösterilen FPS'e göre seçiyoruz
+    if (display_fps >= 50) {
         color = YESIL; 
-    } else if (fps >= 30) {
+    } else if (display_fps >= 30) {
         color = SARI; 
     } else {
         color = KIRMIZI; 
     }
     
     char fps_text[20];
-    snprintf(fps_text, sizeof(fps_text), "[FPS: %d]", fps);
+    snprintf(fps_text, sizeof(fps_text), "[FPS: %d]", display_fps);
     Render_DrawText(fps_x, fps_y, fps_text, color);
 }

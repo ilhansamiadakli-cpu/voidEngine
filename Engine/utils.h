@@ -2,6 +2,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdbool.h>
 
 typedef struct {
@@ -33,5 +37,9 @@ void Daktilo(const char* metin, int ms, const char* renk);
 // --- Zamanlama ---
 void saniye_bekle(double saniye);
 void ms_bekle(int milisaniye);  // Game Loop FPS kilidi için (Yeni!)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // UTILS_H

@@ -1,6 +1,9 @@
 #ifndef CORE_H
 #define CORE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <stdbool.h>
 
 // --- FPS AYARLARI ---
@@ -14,6 +17,10 @@ double GetCurrentTimeInSeconds(void); // Zaman ölçümü için
 
 
 // Motorun ana döngüsü. Dışarıdan oyunun kurallarını parametre olarak alır.
-void Engine_Run(void (*UpdateFunc)(char, float), void (*RenderFunc)(float));
+void Engine_Run(void (*UpdateFunc)(int, float), void (*RenderFunc)(float));
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // CORE_H

@@ -150,19 +150,20 @@ void UI_Render(void) {
         const char* renk;
 
         if (menu_elements[i].type == UI_LABEL) {
-            sprintf(buffer, "%s", menu_elements[i].text);
-            renk = menu_elements[i].renk_kodu; // Kendi rengini kullan!
-        } 
+            // sprintf yerine snprintf! (Boyut kontrolü eklendi)
+            snprintf(buffer, sizeof(buffer), "%s", menu_elements[i].text);
+            renk = menu_elements[i].renk_kodu;
+        }
         else if (menu_elements[i].type == UI_TWLABEL) {
-            sprintf(buffer, "%.*s", menu_elements[i].tw.su_anki_indis, menu_elements[i].text);
+            snprintf(buffer, sizeof(buffer), "%.*s", menu_elements[i].tw.su_anki_indis, menu_elements[i].text);
             renk = menu_elements[i].renk_kodu; // Kendi rengini kullan!
         }
         else if (menu_elements[i].type == UI_BUTTON) {
             if (i == current_selection) {
-                sprintf(buffer, "> %s <", menu_elements[i].text);
+                snprintf(buffer, sizeof(buffer), "> %s <", menu_elements[i].text);
                 renk = YESIL; // Seçiliyse parlasın (Bunu da istersen ileride txt'ye bağlayabiliriz)
             } else {
-                sprintf(buffer, "  %s  ", menu_elements[i].text);
+                snprintf(buffer, sizeof(buffer), "  %s  ", menu_elements[i].text);
                 renk = menu_elements[i].renk_kodu; // Seçili değilse kendi renginde dursun
             }
         }

@@ -77,7 +77,7 @@ void Engine_Stop(void) {
 }
 
 // İŞTE MOTORUN KALBİ (THE GAME LOOP)
-void Engine_Run(void (*UpdateFunc)(char, float), void (*RenderFunc)(float)) {
+void Engine_Run(void (*UpdateFunc)(int, float), void (*RenderFunc)(float)) {
     is_running = true;
     double lastTime = GetCurrentTimeInSeconds();// Zaman ölçümü için başlangıç zamanı
 
@@ -86,8 +86,9 @@ void Engine_Run(void (*UpdateFunc)(char, float), void (*RenderFunc)(float)) {
         double currentTime = GetCurrentTimeInSeconds();// Şu anki zamanı al
         float deltaTime = (float)(currentTime - lastTime);// İki döngü arasındaki geçen süre (saniye cinsinden)
         lastTime = currentTime;
+        
         // 1. GİRİŞ (INPUT)
-        char tus = Input_GetRawKey();
+        int tus = Input_GetRawKey();
 
         // 2. GÜNCELLEME (UPDATE)
         // Motor oyunun ne olduğunu bilmez, sadece "Oyun geliştiricisi ne verdiyse onu çalıştır" der.
