@@ -48,7 +48,7 @@ void Haritayi_Kaydet(void) {
     fclose(dosya);
 }
 
-void Editor_Guncelle(char tus) {
+void Editor_Guncelle(int tus, float deltaTime) {
     if (tus == 'q') {
         Engine_Stop();
         return;
@@ -77,7 +77,7 @@ void Editor_Guncelle(char tus) {
     }
 }
 
-void Editor_Ciz(void) {
+void Editor_Ciz(float deltaTime) {
     for (int y = 0; y < YUKSEKLIK; y++) {
         for (int x = 0; x < GENISLIK; x++) {
             

@@ -7,6 +7,7 @@
 #include "../Engine/input.h"
 #include"../Engine/UI.h"
 #include "../Engine/Physics.h"
+#include "../Engine/Map.h"
 #include <stdio.h>
 
 
@@ -14,15 +15,16 @@
 typedef enum { EKRAN_MENU, EKRAN_OYUN } OyunDurumu;
 static OyunDurumu aktif_ekran = EKRAN_MENU; // Oyun ilk açıldığında menü ile başlar!
 
-static float oyuncu_x = 10, oyuncu_y = 10;
-static int canavar_x = 30, canavar_y = 10;
+static float oyuncu_x = 3, oyuncu_y = 3;
+static int canavar_x = 10, canavar_y = 5;
 float hız=50.0f;
 bool etkilendi = false;
 
 void Oyun_Baslat(void) {
-    // Yorumlayıcı çalışır ve txt dosyasını okuyup RAM'e kaydeder.
-    Typewriter_MsGuncelle(50); // Daktilo hızını güncelle (örneğin, 300 ms yap)
-    UI_LoadMenu("Game/menu.txt"); 
+    setTargetFPS(120);
+    Typewriter_MsGuncelle(50); 
+    UI_LoadMenu("Resources/menu1.txt"); 
+    Map_Load("Resources/harita4.txt"); 
 }
 
 void Oyun_Guncelle(int tus, float deltaTime) {
@@ -64,13 +66,13 @@ void Oyun_Guncelle(int tus, float deltaTime) {
 
         // 3. ADIM: ÇARPIŞMA KONTROLÜ (Geleceği simüle et)
         bool carpistiMi = Physics_CheckCollision(oyuncuKutusu, canavarKutusu);
+        bool duvaraCarpti = Map_CheckCollision(oyuncuKutusu);
 
          // Ayrıca Ekran Sınırlarını da kontrol edelim (Dışarı çıkmasın)
-        bool ekranDisiMi = (hedef_x < 0 || hedef_x >= SCR_WIDTH || 
-                    hedef_y < 0 || hedef_y >= SCR_HEIGHT);
+        bool ekranDisiMi = (hedef_x < 0 || hedef_x >= SCR_WIDTH || hedef_y < 0 || hedef_y >= SCR_HEIGHT);
 
         // 4. ADIM: EĞER GÜVENLİYSE HAREKETİ ONAYLA
-        if (!carpistiMi && !ekranDisiMi) {
+        if (!carpistiMi && !ekranDisiMi && !duvaraCarpti) {
         oyuncu_x = hedef_x;
         oyuncu_y = hedef_y;
         } else if (carpistiMi) {
@@ -90,35 +92,32 @@ void Oyun_Guncelle(int tus, float deltaTime) {
 
 void Oyun_Ekrana_Ciz(float deltaTime) {
     // Motor tuvali zaten temizledi. Şimdi ne çizeceğimize karar verelim:
-    setTargetFPS(60); // FPS'i 60'a sabitle (opsiyonel, ama genellikle iyi bir fikir)
     if (aktif_ekran == EKRAN_MENU) {
         // Sadece butonları çizmekle kalma, menüdeki tüm elemanları çiz (LABEL'lar da dahil)
         UI_Render(); 
     } 
     else if (aktif_ekran == EKRAN_OYUN) {
-
+        Map_Render(MAVI); // Haritayı çiz (duvarlar, boşluklar vs.)
         int oyuncuCizim_x = (int)oyuncu_x;
         int oyuncuCizim_y = (int)oyuncu_y;
 
         Render_DrawPixel(oyuncuCizim_x, oyuncuCizim_y, '@', SARI);
-        DrawFPS(69, 1, deltaTime); // FPS'i sağ üst köşeye çiz
-        Render_DrawText(2, 0, "WASD ile hareket, Q ile cikis, F/G ile hiz artir/azalt, E ile etkilesim", SARI);
+        DrawFPS(1, 22, deltaTime); // FPS'i sağ üst köşeye çiz
+        char hızMetni[20];
+        sprintf(hızMetni, " %.1f", hız);
+        Render_DrawText(69,22,"Hiz:", SARI);
+        Render_DrawText(72, 22, hızMetni, CYAN);
 
-        Render_DrawText(3, 2, "Hiz: ", MAVI);// hız göstergesi basılamıyor malesef, çünkü Render_DrawText fonksiyonu şu anda sadece sabit metinler için tasarlandı. Hızı dinamik olarak göstermek için önce hızı bir string'e çevirmemiz gerekiyor. İşte nasıl yapabileceğimiz:
-        char hiz_str[10];
-        sprintf(hiz_str, "%.1f", hız); // Hızı string'e çevir (örneğin, 1.0, 1.5 gibi)
-        Render_DrawText(8, 2, hiz_str, SARI); // Hızı ekrana yazdır
 
-        if(!etkilendi) Render_DrawText(oyuncuCizim_x + 1, oyuncuCizim_y - 1, "Burasi neresi?", BEYAZ); 
+
         Render_DrawPixel(canavar_x, canavar_y, 'M', KIRMIZI);
-        Render_DrawText(2, 1, "voidEngine v0.3", CYAN);
+        //Render_DrawText(65, 3, "voidEngine v0.3", CYAN);
 
-        if(etkilendi && oyuncuCizim_x > canavar_x - 2 && oyuncuCizim_x < canavar_x + 2 && oyuncuCizim_y > canavar_y - 2 && oyuncuCizim_y < canavar_y + 2    ){
-            Render_DrawText(oyuncuCizim_x+1, oyuncuCizim_y-1, "Sende kimsin?", BOLD);
+        if (etkilendi) {
+            Render_DrawText(13, 22, "CANAVARA CARPTIN!", KIRMIZI);
         }
-        else{
-            Render_DrawText(oyuncuCizim_x + 1, oyuncuCizim_y - 1, "Burasi neresi?", BEYAZ);
-            etkilendi=false; 
-        } 
+        else {
+            Render_DrawText(13, 22, "                   ", BEYAZ); // Mesajı temizle
+        }
     }
 }
