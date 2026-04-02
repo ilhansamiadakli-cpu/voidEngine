@@ -1,7 +1,6 @@
 // Game/game.c
 #include "game.h"
 #include "../Engine/core.h"
-#include "../Engine/utils.h"
 #include "../Engine/colors.h"
 #include "../Engine/render.h"
 #include "../Engine/input.h"
@@ -21,7 +20,7 @@ float hız=50.0f;
 bool etkilendi = false;
 
 void Oyun_Baslat(void) {
-    setTargetFPS(120);
+    setTargetFPS(60);
     Typewriter_MsGuncelle(50); 
     UI_LoadMenu("Resources/menu1.txt"); 
     Map_Load("Resources/harita4.txt"); 

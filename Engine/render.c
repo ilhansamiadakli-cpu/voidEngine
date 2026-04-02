@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "render.h"
 #include "colors.h"
-#include "core.h"
+
 
 
 // --- MOTORUN İÇ ORGANLARI (Dışarıdan erişilemez!) ---

@@ -1,6 +1,5 @@
 // Game/main.c dosyasının içi
 #include "../Engine/core.h"
-#include "../Engine/utils.h"
 #include "game.h"
 
 int main(void) {
